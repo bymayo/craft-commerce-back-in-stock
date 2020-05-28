@@ -36,7 +36,7 @@ class BackInStockService extends Component
         // check that before save variant had 0 stock and was not unlimited
         $originalObject = Variant::findOne($variant->id);
         if ($originalObject) {
-            if ($originalObject->stock == 0 && !$originalObject->hasUnlimitedStock) {
+            if ($originalObject->variantInventory == 0) {
                 $this->findInterestedEmails($variant->id);
                 return true;
             }
@@ -73,6 +73,7 @@ class BackInStockService extends Component
 
     public function createBackInStockRecord(BackInStockModel $model)
     {
+
         if ($model->variantId && $model->email) {
 
             // prevent duplicate notification requests

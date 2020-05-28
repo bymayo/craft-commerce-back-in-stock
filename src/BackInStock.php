@@ -20,6 +20,7 @@ use craft\base\Plugin;
 use craft\services\Plugins;
 use craft\events\ModelEvent;
 use craft\events\PluginEvent;
+use craft\helpers\FileHelper;
 use craft\web\UrlManager;
 use craft\events\RegisterUrlRulesEvent;
 use craft\commerce\elements\Variant;
@@ -52,6 +53,13 @@ class BackInStock extends Plugin
     // Public Methods
     // =========================================================================
 
+    public static function log($message)
+    {
+        $file = Craft::getAlias('@storage/logs/backinstock.log');
+        $log = date('Y-m-d H:i:s'). ' ' . $message . "\n";
+        FileHelper::writeToFile($file, $log, ['append' => true]);
+    }
+
     /**
      * @inheritdoc
      */
@@ -83,7 +91,7 @@ class BackInStock extends Plugin
 
         Event::on(Variant::class, Variant::EVENT_BEFORE_SAVE, function(ModelEvent $event) {
             $variant = $event->sender;
-            if ($variant->stock > 0 || $variant->hasUnlimitedStock) {
+            if ($variant->variantInventory > 0) {
                 $this->backInStockService->isBackInStock($variant);
             }
         });

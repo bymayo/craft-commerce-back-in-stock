@@ -86,6 +86,8 @@ class BaseController extends Controller
         //check is product exists and is actually out of stock
         $variant = Variant::findOne($variantId);
 
+        BackInStock::log($variant->variantInventory);
+
         if (!$variant) {
             $error = Craft::t('craft-commerce-back-in-stock', 'Unable to find variant');
 
@@ -101,7 +103,8 @@ class BaseController extends Controller
             return null;
         }
 
-        if ($variant->hasStock()) {
+        if ($variant->variantInventory > 0) {
+
             $error = Craft::t('craft-commerce-back-in-stock', 'Variant is in stock!');
 
             if ($request->getAcceptsJson()) {
